@@ -1,0 +1,138 @@
+import java.util.Scanner;
+class Node {
+    int rollNumber;
+    String name;
+    Node left, right;
+
+    public Node(int rollNumber, String name) {
+        this.rollNumber = rollNumber;
+        this.name = name;
+        left = right = null;
+    }
+}
+class StudentBST {
+    private Node root;
+    public void insert(int rollNumber, String name) {
+        root = insertRec(root, rollNumber, name);
+    }
+    private Node insertRec(Node root, int rollNumber, String name) {
+        if (root == null) {
+            return new Node(rollNumber, name);
+        }
+        if (rollNumber < root.rollNumber) {
+            root.left = insertRec(root.left, rollNumber, name);
+        } else if (rollNumber > root.rollNumber) {
+            root.right = insertRec(root.right, rollNumber, name);
+        }
+        return root;
+    }
+    public boolean search(int rollNumber) {
+        return searchRec(root, rollNumber) != null;
+    }
+
+    private Node searchRec(Node root, int rollNumber) {
+        if (root == null || root.rollNumber == rollNumber) {
+            return root;
+        }
+        if (root.rollNumber > rollNumber) {
+            return searchRec(root.left, rollNumber);
+        }
+        return searchRec(root.right, rollNumber);
+    }
+    public void delete(int rollNumber) {
+        root = deleteRec(root, rollNumber);
+    }
+    private Node deleteRec(Node root, int rollNumber) {
+        if (root == null) return root;
+
+        if (rollNumber < root.rollNumber) {
+            root.left = deleteRec(root.left, rollNumber);
+        } else if (rollNumber > root.rollNumber) {
+            root.right = deleteRec(root.right, rollNumber);
+        } else {
+            if (root.left == null) return root.right;
+            else if (root.right == null) return root.left;
+            root.rollNumber = minValue(root.right);
+            root.name = findName(root.right, root.rollNumber);
+            root.right = deleteRec(root.right, root.rollNumber);
+        }
+        return root;
+    }
+    private int minValue(Node root) {
+        int minv = root.rollNumber;
+        while (root.left != null) {
+            minv = root.left.rollNumber;
+            root = root.left;
+        }
+        return minv;
+    }
+    private String findName(Node root, int rollNumber) {
+        Node curr = searchRec(root, rollNumber);
+        return curr != null ? curr.name : "";
+    }
+    public void inorder() {
+        inorderRec(root);
+        System.out.println();
+    }
+    private void inorderRec(Node root) {
+        if (root != null) {
+            inorderRec(root.left);
+            System.out.println("Roll No: " + root.rollNumber + ", Name: " + root.name);
+            inorderRec(root.right);
+        }
+    }
+}
+public class BST {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        StudentBST bst = new StudentBST();
+        int choice;
+        do {
+            System.out.println("\nUniversity Student Records (BST)");
+            System.out.println("1. Insert Student");
+            System.out.println("2. Search Student");
+            System.out.println("3. Delete Student");
+            System.out.println("4. Display Records (In-order)");
+            System.out.println("5. Exit");
+            System.out.print("Enter your choice: ");
+            choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter Roll Number: ");
+                    int roll = scanner.nextInt();
+                    scanner.nextLine(); 
+                    System.out.print("Enter Student Name: ");
+                    String name = scanner.nextLine();
+                    bst.insert(roll, name);
+                    System.out.println("Student added successfully.");
+                    break;
+                case 2:
+                    System.out.print("Enter Roll Number to search: ");
+                    int sRoll = scanner.nextInt();
+                    if (bst.search(sRoll)) {
+                        System.out.println("Student with Roll Number " + sRoll + " found.");
+                    } else {
+                        System.out.println("Student not found.");
+                    }
+                    break;
+                case 3:
+                    System.out.print("Enter Roll Number to delete: ");
+                    int dRoll = scanner.nextInt();
+                    bst.delete(dRoll);
+                    System.out.println("Record deleted (if it existed).");
+                    break;
+                case 4:
+                    System.out.println("Sorted Student Records:");
+                    bst.inorder();
+                    break;
+                case 5:
+                    System.out.println("Exiting program.");
+                    break;
+                default:
+                    System.out.println("Invalid choice. Try again.");
+            }
+        } while (choice != 5);
+        scanner.close();
+    }
+}
